@@ -25,6 +25,18 @@ export default class AssetLoader {
     return Object.keys(assetFiles);
   }
 
+  async loadAssets() {
+    for (const asset of this.manifest) {
+      Assets.add(asset.name, asset.url);
+    }
+
+    const resources = await Assets.load(this.manifest.map((asset) => asset.name));
+
+    Debug.log("✅ Loaded assets", resources);
+
+    return resources;
+  }
+
   async loadAssetsGroup(group: string) {
     const sceneAssets = this.manifest.filter((asset) => asset.group === group);
 
