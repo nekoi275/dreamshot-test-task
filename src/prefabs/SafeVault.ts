@@ -1,16 +1,13 @@
 import { Container, Sprite, Texture, Graphics } from "pixi.js";
 
-export type VaultConfig = {
-  layers: string[];
-};
-
 export default class SafeVault extends Container {
   name = "SafeVault";
-  private bg?: Sprite;
+  private bg: Sprite;
   private combination: string[] = [];
 
   constructor() {
     super();
+    this.bg = new Sprite(Texture.from("bg"));
     this.init();
   }
 
@@ -30,16 +27,13 @@ export default class SafeVault extends Container {
   }
 
   init() {
-    const texture = Texture.from("bg");
-    this.bg = new Sprite(texture);
-    this.resize(window.innerWidth, window.innerHeight)
+    this.setSize(window.innerWidth, window.innerHeight)
 
     this.addChild(this.bg);
     this.generateCombination();
   }
 
-  resize(width: number, height: number) {
-    if (!this.bg) return;
+  setSize(width: number, height: number) {
     const targetSize = Math.min(width, height);
     const scale = targetSize / this.bg.texture.height;
 

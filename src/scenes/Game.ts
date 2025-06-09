@@ -2,7 +2,7 @@ import { Container, Text, Graphics, Texture } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 import { SceneUtils } from "../core/App";
 import SafeVault from "../prefabs/SafeVault";
-import SafeDoor from "../prefabs/SafeDoor";
+import SafeDoor from "../prefabs/SafeDoor2";
 
 export default class Game extends Container {
   name = "Game";
@@ -36,13 +36,14 @@ export default class Game extends Container {
   async start() {
     this.removeChildren();    
     this.safevault = new SafeVault();
-    //this.safeDoor = new SafeDoor(scaleX, scaleY);
+    this.safeDoor = new SafeDoor();
     
     this.addChild(this.safevault);
-    //this.addChild(this.safeDoor);
+    this.addChild(this.safeDoor);
   }
 
   onResize(width: number, height: number) {
-    this.safevault.resize(width, height);
+    this.safevault.setSize(width, height);
+    this.safeDoor.setSize(width, height);
   }
 }
