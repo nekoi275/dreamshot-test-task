@@ -1,4 +1,4 @@
-import { Container, Text, Graphics } from "pixi.js";
+import { Container, Text, Graphics, Texture } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 import { SceneUtils } from "../core/App";
 import SafeVault from "../prefabs/SafeVault";
@@ -34,11 +34,15 @@ export default class Game extends Container {
   }
 
   async start() {
-    this.removeChildren();
+    this.removeChildren();    
     this.safevault = new SafeVault();
-    this.safeDoor = new SafeDoor();
+    //this.safeDoor = new SafeDoor(scaleX, scaleY);
     
     this.addChild(this.safevault);
-    this.addChild(this.safeDoor);
+    //this.addChild(this.safeDoor);
+  }
+
+  onResize(width: number, height: number) {
+    this.safevault.resize(width, height);
   }
 }
