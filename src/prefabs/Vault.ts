@@ -1,7 +1,7 @@
-import { Container, Sprite, Texture, Graphics } from "pixi.js";
+import { Container, Sprite, Texture } from "pixi.js";
 
-export default class SafeVault extends Container {
-  name = "SafeVault";
+export default class Vault extends Container {
+  name = "Vault";
   private bg: Sprite;
   private combination: string[] = [];
 

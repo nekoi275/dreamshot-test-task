@@ -1,14 +1,14 @@
-import { Container, Text, Graphics, Texture } from "pixi.js";
+import { Container, Text, Graphics } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 import { SceneUtils } from "../core/App";
-import SafeVault from "../prefabs/SafeVault";
-import SafeDoor from "../prefabs/SafeDoor";
+import Vault from "../prefabs/Vault";
+import Door from "../prefabs/Door";
 
 export default class Game extends Container {
   name = "Game";
 
-  private safevault!: SafeVault;
-  private safeDoor!: SafeDoor;
+  private vault!: Vault;
+  private door!: Door;
 
   constructor(protected utils: SceneUtils) {
     super();
@@ -35,15 +35,15 @@ export default class Game extends Container {
 
   async start() {
     this.removeChildren();    
-    this.safevault = new SafeVault();
-    this.safeDoor = new SafeDoor();
+    this.vault = new Vault();
+    this.door = new Door();
     
-    this.addChild(this.safevault);
-    this.addChild(this.safeDoor);
+    this.addChild(this.vault);
+    this.addChild(this.door);
   }
 
   onResize(width: number, height: number) {
-    this.safevault.setSize(width, height);
-    this.safeDoor.setSize(width, height);
+    this.vault.setSize(width, height);
+    this.door.setSize(width, height);
   }
 }
