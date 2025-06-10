@@ -2,7 +2,7 @@ import { Container, Text, Graphics, Texture } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 import { SceneUtils } from "../core/App";
 import SafeVault from "../prefabs/SafeVault";
-import SafeDoor from "../prefabs/SafeDoor2";
+import SafeDoor from "../prefabs/SafeDoor";
 
 export default class Game extends Container {
   name = "Game";
