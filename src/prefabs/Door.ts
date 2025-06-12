@@ -1,4 +1,4 @@
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container, Sprite, Texture, Graphics } from "pixi.js";
 import DoorHandle from "../prefabs/DoorHandle";
 
 export default class Door extends Container {
@@ -45,7 +45,22 @@ export default class Door extends Container {
   }
 
   public get isOpened() {
-    return this._isOpened
+    return this._isOpened;
+  }
+
+  private initHitArea(isLeft: boolean, eventHandler: (event: any) => void) {
+    const scale = Math.min(window.innerWidth, window.innerHeight) / 3000;
+    const angle = isLeft ? Math.PI / 2 : -Math.PI / 2;
+    const hitArea = new Graphics()
+      .beginFill(0, 0.1)
+      .arc(0, 0, this.door.texture.width * scale, angle, -angle)
+      .closePath();
+
+    hitArea.eventMode = "static";
+    hitArea.cursor = "pointer";
+    hitArea.on("pointertap", eventHandler);
+
+    this.door.addChild(hitArea);
   }
 
   init() {
@@ -54,6 +69,14 @@ export default class Door extends Container {
     this.addChild(this.doorHandle);
     this.addChild(this.doorOpenShadow);
     this.addChild(this.doorOpen);
+    this.initHitArea(true, () => {
+      console.log("left");
+      this.doorHandle.controlAnimation(true);
+    });
+    this.initHitArea(false, () => {
+      console.log("right");
+      this.doorHandle.controlAnimation(false);
+    });
   }
 
   setSize(width: number, height: number) {

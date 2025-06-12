@@ -1,4 +1,5 @@
-import { Container, Sprite, Texture, Graphics } from "pixi.js";
+import { Container, Sprite, Texture } from "pixi.js";
+import gsap from "gsap";
 
 export default class DoorHandle extends Container {
   name = "DoorHandle";
@@ -14,31 +15,23 @@ export default class DoorHandle extends Container {
     this.init();
   }
 
-  private initHitArea(
-    isLeft: boolean,
-    eventHandler: (event: any) => void
-  ) {
-    const angle = isLeft ? Math.PI / 2 : -Math.PI / 2;
-    const hitArea = new Graphics()
-      .beginFill(0, 0.01)
-      .arc(0, 0, this.handle.texture.width, angle, -angle)
-      .closePath();
-    hitArea.eventMode = "static";
-    hitArea.cursor = "pointer";
-    hitArea.on("pointertap", eventHandler);
-    this.handle.addChild(hitArea);
+  controlAnimation(isLeft: boolean) {
+    const direction = isLeft ? -1 : 1;
+    const currentRotation = this.handle.rotation;
+    const targetRotation = currentRotation + (Math.PI / 3) * direction;
+
+    gsap.killTweensOf([this.handle, this.handleShadow]);
+    gsap.to([this.handle, this.handleShadow], {
+      rotation: targetRotation,
+      duration: 0.3,
+      ease: "power2.out",
+    });
   }
 
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.handleShadow);
     this.addChild(this.handle);
-    this.initHitArea(false, () => {
-      console.log("right");
-    });
-    this.initHitArea(true, () => {
-        console.log("left");
-      });
   }
 
   setSize(width: number, height: number) {
