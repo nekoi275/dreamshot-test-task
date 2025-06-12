@@ -6,27 +6,61 @@ export default class Door extends Container {
 
   private door: Sprite;
   private doorHandle: DoorHandle;
+  private doorOpenShadow: Sprite;
+  private doorOpen: Sprite;
+  private _isOpened: boolean = false;
 
   constructor() {
     super();
     this.door = new Sprite(Texture.from("door"));
     this.doorHandle = new DoorHandle();
+    this.doorOpenShadow = new Sprite(Texture.from("doorOpenShadow"));
+    this.doorOpen = new Sprite(Texture.from("doorOpen"));
+    this.isOpened = false;
     this.init();
+  }
+
+  private setupSprite(
+    sprite: Sprite,
+    width: number,
+    height: number,
+    offsetX: number,
+    offsetY: number
+  ) {
+    const scale = Math.min(width, height) / 3000; // target size / bg height in pixels
+    sprite.scale.set(scale);
+    sprite.anchor.set(0.5);
+    sprite.position.set(
+      width / 2 + offsetX * scale,
+      height / 2 + offsetY * scale
+    );
+  }
+
+  public set isOpened(isOpened: boolean) {
+    this._isOpened = isOpened;
+    this.door.visible = !isOpened;
+    this.doorOpen.visible = isOpened;
+    this.doorOpenShadow.visible = isOpened;
+    this.doorHandle.visible = !isOpened;
+  }
+
+  public get isOpened() {
+    return this._isOpened
   }
 
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.door);
     this.addChild(this.doorHandle);
+    this.addChild(this.doorOpenShadow);
+    this.addChild(this.doorOpen);
   }
 
   setSize(width: number, height: number) {
-    const scale = Math.min(width, height) / 3000; // target size / bg height in pixels
-    this.door.scale.set(scale);
-    this.door.anchor.set(0.5);
-    const offsetY = -40 * scale; // adjustment according to door position on bg
-    const offsetX = 66 * scale;
-    this.door.position.set(width / 2 + offsetX, height / 2 + offsetY);
+    this.setupSprite(this.door, width, height, 66, -40);
+    this.setupSprite(this.doorOpenShadow, width, height, 1520, 20);
+    this.setupSprite(this.doorOpen, width, height, 1450, -40);
+
     this.doorHandle.setSize(width, height);
   }
 }
