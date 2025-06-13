@@ -79,7 +79,7 @@ export default class Combination {
     } else {
       const lastStep = this.sequence[this.sequence.length - 1];
       if (lastStep) {
-        lastStep.turns = Math.min(lastStep.turns + 1, 9);
+        lastStep.turns += 1;
       }
     }
   }
