@@ -52,8 +52,8 @@ export default class Door extends Container {
     const scale = Math.min(window.innerWidth, window.innerHeight) / 3000;
     const angle = isLeft ? Math.PI / 2 : -Math.PI / 2;
     const hitArea = new Graphics()
-      .beginFill(0, 0.1)
-      .arc(0, 0, this.door.texture.width * scale, angle, -angle)
+      .beginFill(0, 0.01)
+      .arc(-360 * scale, 0, 1750 * scale, angle, -angle)
       .closePath();
 
     hitArea.eventMode = "static";
