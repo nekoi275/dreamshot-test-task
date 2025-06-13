@@ -1,44 +1,86 @@
+enum Direction {
+  Clockwise = "clockwise",
+  CounterClockwise = "counterclockwise",
+}
+
+type CombinationStep = {
+  turns: number; // 1-9
+  direction: Direction;
+};
+
 export default class Combination {
-    private readonly sequence: number[];
-    private readonly firstDirection: boolean; // true = clockwise, false = counterclockwise
-  
-    constructor(firstNumber: number, firstDirection: boolean) {
-      this.sequence = [firstNumber];
-      this.firstDirection = firstDirection;
+  private sequence: CombinationStep[] = [];
+  private currentDirection: Direction | null = null;
+
+  private addStep(turns: number, direction: Direction) {
+    this.sequence.push({ turns, direction });
+  }
+
+  public equals(other: Combination): boolean {
+    if (this.sequence.length !== other.sequence.length) {
+      return false;
     }
-  
-    public addNumber(num: number) {
-      this.sequence.push(num)
+    return this.sequence.every(
+      (step, i) =>
+        step.turns === other.sequence[i].turns &&
+        step.direction === other.sequence[i].direction
+    );
+  }
+
+  public isValid(other: Combination) {
+    if (other.sequence.length > this.sequence.length) {
+      return false;
     }
-  
-    public equals(other: Combination): boolean {
-      if (this.sequence.length !== other.sequence.length) return false;
-      return (
-        this.sequence.every((val, i) => val === other.sequence[i]) &&
-        this.firstDirection === other.firstDirection
-      );
+
+    return other.sequence.every((step, i) => {
+      const isLastStep = i === other.sequence.length - 1;
+      const turnsMatch = isLastStep
+        ? step.turns <= this.sequence[i].turns
+        : step.turns === this.sequence[i].turns;
+
+      return turnsMatch && step.direction === this.sequence[i].direction;
+    });
+  }
+
+  public static newRandom(length = 3): Combination {
+    const combination = new Combination();
+    let currentDirection =
+      Math.random() > 0.5 ? Direction.Clockwise : Direction.CounterClockwise;
+
+    for (let i = 0; i < length; i++) {
+      const turns = Math.floor(Math.random() * 9) + 1;
+      combination.addStep(turns, currentDirection);
+      currentDirection =
+        currentDirection === Direction.Clockwise
+          ? Direction.CounterClockwise
+          : Direction.Clockwise;
     }
-  
-    public static generateRandom(length = 3): Combination {
-      const firstDirection = Math.random() > 0.5;
-      const combination = new Combination(Math.floor(Math.random() * 9) + 1, firstDirection);
-      for (let i = 1; i < length; i++) {
-        combination.addNumber(Math.floor(Math.random() * 9) + 1);
+    return combination;
+  }
+
+  public toString(): string {
+    return this.sequence
+      .map((step) => `${step.turns} ${step.direction}`)
+      .join(", ");
+  }
+
+  public turnClockwise(): void {
+    this.handleTurn(Direction.Clockwise);
+  }
+
+  public turnCounterClockwise(): void {
+    this.handleTurn(Direction.CounterClockwise);
+  }
+
+  private handleTurn(newDirection: Direction): void {
+    if (this.currentDirection !== newDirection) {
+      this.addStep(1, newDirection);
+      this.currentDirection = newDirection;
+    } else {
+      const lastStep = this.sequence[this.sequence.length - 1];
+      if (lastStep) {
+        lastStep.turns = Math.min(lastStep.turns + 1, 9);
       }
-  
-      return combination;
-    }
-  
-    public toString(): string {
-      return this.sequence.map((num, i) => {
-        let direction: string;
-        if (i % 2 === 0) {
-          direction = this.firstDirection ? "clockwise" : "counterclockwise";
-        } else {
-          direction = this.firstDirection ? "counterclockwise" : "clockwise";
-        }
-        return `${num} ${direction}`;
-      }).join(", ");
     }
   }
-  
+}

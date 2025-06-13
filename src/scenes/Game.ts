@@ -3,14 +3,12 @@ import { centerObjects } from "../utils/misc";
 import { SceneUtils } from "../core/App";
 import Vault from "../prefabs/Vault";
 import Door from "../prefabs/Door";
-import Combination from "../model/Combination";
 
 export default class Game extends Container {
   name = "Game";
 
   private vault!: Vault;
   private door!: Door;
-  private combination!: Combination;
 
   constructor(protected utils: SceneUtils) {
     super();
@@ -42,8 +40,6 @@ export default class Game extends Container {
     
     this.addChild(this.vault);
     this.addChild(this.door);
-    this.combination = Combination.generateRandom(3);
-    console.log(this.combination.toString());
   }
 
   onResize(width: number, height: number) {

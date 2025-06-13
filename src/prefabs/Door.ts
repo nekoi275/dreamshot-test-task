@@ -1,22 +1,22 @@
 import { Container, Sprite, Texture, Graphics } from "pixi.js";
 import DoorHandle from "../prefabs/DoorHandle";
+import Combination from "../model/Combination";
 
 export default class Door extends Container {
   name = "Door";
 
-  private door: Sprite;
-  private doorHandle: DoorHandle;
-  private doorOpenShadow: Sprite;
-  private doorOpen: Sprite;
+  private door: Sprite = new Sprite(Texture.from("door"));
+  private doorHandle: DoorHandle = new DoorHandle();
+  private doorOpenShadow: Sprite = new Sprite(Texture.from("doorOpenShadow"));
+  private doorOpen: Sprite = new Sprite(Texture.from("doorOpen"));
   private _isOpened: boolean = false;
+  private secretCombination: Combination = Combination.newRandom(3);
+  private inputCombination: Combination = new Combination();
 
   constructor() {
     super();
-    this.door = new Sprite(Texture.from("door"));
-    this.doorHandle = new DoorHandle();
-    this.doorOpenShadow = new Sprite(Texture.from("doorOpenShadow"));
-    this.doorOpen = new Sprite(Texture.from("doorOpen"));
     this.isOpened = false;
+
     this.init();
   }
 
@@ -63,19 +63,41 @@ export default class Door extends Container {
     this.door.addChild(hitArea);
   }
 
+  private onTap(isLeft: boolean) {
+    this.doorHandle.controlAnimation(isLeft);
+
+    isLeft
+      ? this.inputCombination.turnCounterClockwise()
+      : this.inputCombination.turnClockwise();
+
+    const isValid = this.secretCombination.isValid(this.inputCombination);
+    const isEqual = this.secretCombination.equals(this.inputCombination);
+
+    if (!isValid && !isEqual) {
+      this.reset();
+    } else if (isValid && isEqual) {
+      this.isOpened = true;
+    }
+  }
+
+  private reset() {
+    this.secretCombination = Combination.newRandom(3);
+    this.inputCombination = new Combination();
+    console.log(this.secretCombination.toString());
+  }
+
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.door);
     this.addChild(this.doorHandle);
     this.addChild(this.doorOpenShadow);
     this.addChild(this.doorOpen);
+    console.log(this.secretCombination.toString());
     this.initHitArea(true, () => {
-      console.log("left");
-      this.doorHandle.controlAnimation(true);
+      this.onTap(true);
     });
     this.initHitArea(false, () => {
-      console.log("right");
-      this.doorHandle.controlAnimation(false);
+      this.onTap(false);
     });
   }
 

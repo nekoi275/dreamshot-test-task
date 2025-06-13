@@ -6,6 +6,7 @@ export default class DoorHandle extends Container {
 
   private handleShadow: Sprite;
   private handle: Sprite;
+  public currentNumber: number = 0;
 
   constructor() {
     super();
@@ -19,6 +20,7 @@ export default class DoorHandle extends Container {
     const direction = isLeft ? -1 : 1;
     const currentRotation = this.handle.rotation;
     const targetRotation = currentRotation + (Math.PI / 3) * direction;
+    this.currentNumber += 1;
 
     gsap.killTweensOf([this.handle, this.handleShadow]);
     gsap.to([this.handle, this.handleShadow], {
