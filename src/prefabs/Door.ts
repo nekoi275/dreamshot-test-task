@@ -74,6 +74,7 @@ export default class Door extends Container {
     const isEqual = this.secretCombination.equals(this.inputCombination);
 
     if (!isValid && !isEqual) {
+      this.doorHandle.spinLikeCrazy();
       this.reset();
     } else if (isValid && isEqual) {
       this.isOpened = true;
