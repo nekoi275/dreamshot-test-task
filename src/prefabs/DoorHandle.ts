@@ -1,10 +1,12 @@
-import { Container, Sprite, Texture, Graphics } from "pixi.js";
+import { Container, Sprite, Texture } from "pixi.js";
+import gsap from "gsap";
 
 export default class DoorHandle extends Container {
   name = "DoorHandle";
 
   private handleShadow: Sprite;
   private handle: Sprite;
+  public currentNumber: number = 0;
 
   constructor() {
     super();
@@ -14,31 +16,48 @@ export default class DoorHandle extends Container {
     this.init();
   }
 
-  private initHitArea(
-    isLeft: boolean,
-    eventHandler: (event: any) => void
-  ) {
-    const angle = isLeft ? Math.PI / 2 : -Math.PI / 2;
-    const hitArea = new Graphics()
-      .beginFill(0, 0.01)
-      .arc(0, 0, this.handle.texture.width, angle, -angle)
-      .closePath();
-    hitArea.eventMode = "static";
-    hitArea.cursor = "pointer";
-    hitArea.on("pointertap", eventHandler);
-    this.handle.addChild(hitArea);
+  controlAnimation(isLeft: boolean) {
+    const direction = isLeft ? -1 : 1;
+    const currentRotation = this.handle.rotation;
+    const targetRotation = currentRotation + (Math.PI / 3) * direction;
+    this.currentNumber += 1;
+
+    gsap.killTweensOf([this.handle, this.handleShadow]);
+    gsap.to([this.handle, this.handleShadow], {
+      rotation: targetRotation,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  }
+
+  spinLikeCrazy(): void {
+    gsap.killTweensOf([this.handle, this.handleShadow]);
+
+    const segments = 3 + Math.floor(Math.random() * 3); // 3-5 segments
+    const timeline = gsap.timeline();
+
+    for (let i = 0; i < segments; i++) {
+      const rotations = 2 + Math.floor(Math.random() * 5); // 2-6 rotations
+      const direction = Math.random() > 0.5 ? 1 : -1;
+      const duration = 0.5 + Math.random() * 1; // 0.5-1.5s per segment
+
+      timeline.to([this.handle, this.handleShadow], {
+        rotation: `+=${rotations * Math.PI * 2 * direction}`,
+        duration,
+        ease: "power1.inOut",
+      });
+    }
+
+    timeline.to([this.handle, this.handleShadow], {
+      rotation: this.handle.rotation % (Math.PI * 2), // Normalize final rotation
+      duration: 0.3,
+    });
   }
 
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.handleShadow);
     this.addChild(this.handle);
-    this.initHitArea(false, () => {
-      console.log("right");
-    });
-    this.initHitArea(true, () => {
-        console.log("left");
-      });
   }
 
   setSize(width: number, height: number) {
