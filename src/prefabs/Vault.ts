@@ -63,6 +63,12 @@ export default class Vault extends Container {
     blinkAnimation(this.blink3, 0.6);
   }
 
+  stopAnimateBlinks() {
+    gsap.killTweensOf(this.blink1);
+    gsap.killTweensOf(this.blink2);
+    gsap.killTweensOf(this.blink3);
+  }
+
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.bg);

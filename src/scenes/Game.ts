@@ -3,6 +3,7 @@ import { centerObjects } from "../utils/misc";
 import { SceneUtils } from "../core/App";
 import Vault from "../prefabs/Vault";
 import Door from "../prefabs/Door";
+import { gsap } from "gsap";
 
 export default class Game extends Container {
   name = "Game";
@@ -48,6 +49,12 @@ export default class Game extends Container {
     } else if (isValid && isEqual) {
       this.door.isOpened = true;
       this.vault.startAnimateBlinks();
+      gsap.delayedCall(5, () => {
+        this.door.isOpened = false;
+        this.door.doorHandle.spinLikeCrazy();
+        this.door.reset();
+        this.vault.stopAnimateBlinks();
+      });
     }
   }
 
