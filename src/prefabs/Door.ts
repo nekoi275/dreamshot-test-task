@@ -6,12 +6,12 @@ export default class Door extends Container {
   name = "Door";
 
   private door: Sprite = new Sprite(Texture.from("door"));
-  private doorHandle: DoorHandle = new DoorHandle();
   private doorOpenShadow: Sprite = new Sprite(Texture.from("doorOpenShadow"));
   private doorOpen: Sprite = new Sprite(Texture.from("doorOpen"));
   private _isOpened: boolean = false;
-  private secretCombination: Combination = Combination.newRandom(3);
-  private inputCombination: Combination = new Combination();
+  doorHandle: DoorHandle = new DoorHandle();
+  secretCombination: Combination = Combination.newRandom(3);
+  inputCombination: Combination = new Combination();
 
   constructor() {
     super();
@@ -48,7 +48,13 @@ export default class Door extends Container {
     return this._isOpened;
   }
 
-  private initHitArea(isLeft: boolean, eventHandler: (event: any) => void) {
+  reset() {
+    this.secretCombination = Combination.newRandom(3);
+    this.inputCombination = new Combination();
+    console.log(this.secretCombination.toString());
+  }
+
+  initHitArea(isLeft: boolean, eventHandler: (event: any) => void) {
     const scale = Math.min(window.innerWidth, window.innerHeight) / 3000;
     const angle = isLeft ? Math.PI / 2 : -Math.PI / 2;
     const hitArea = new Graphics()
@@ -63,30 +69,6 @@ export default class Door extends Container {
     this.door.addChild(hitArea);
   }
 
-  private onTap(isLeft: boolean) {
-    this.doorHandle.controlAnimation(isLeft);
-
-    isLeft
-      ? this.inputCombination.turnCounterClockwise()
-      : this.inputCombination.turnClockwise();
-
-    const isValid = this.secretCombination.isValid(this.inputCombination);
-    const isEqual = this.secretCombination.equals(this.inputCombination);
-
-    if (!isValid && !isEqual) {
-      this.doorHandle.spinLikeCrazy();
-      this.reset();
-    } else if (isValid && isEqual) {
-      this.isOpened = true;
-    }
-  }
-
-  private reset() {
-    this.secretCombination = Combination.newRandom(3);
-    this.inputCombination = new Combination();
-    console.log(this.secretCombination.toString());
-  }
-
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.door);
@@ -94,12 +76,6 @@ export default class Door extends Container {
     this.addChild(this.doorOpenShadow);
     this.addChild(this.doorOpen);
     console.log(this.secretCombination.toString());
-    this.initHitArea(true, () => {
-      this.onTap(true);
-    });
-    this.initHitArea(false, () => {
-      this.onTap(false);
-    });
   }
 
   setSize(width: number, height: number) {

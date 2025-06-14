@@ -28,18 +28,47 @@ export default class Game extends Container {
     this.addChild(bg, text);
   }
 
+  private onTap(isLeft: boolean) {
+    this.door.doorHandle.controlAnimation(isLeft);
+
+    isLeft
+      ? this.door.inputCombination.turnCounterClockwise()
+      : this.door.inputCombination.turnClockwise();
+
+    const isValid = this.door.secretCombination.isValid(
+      this.door.inputCombination
+    );
+    const isEqual = this.door.secretCombination.equals(
+      this.door.inputCombination
+    );
+
+    if (!isValid && !isEqual) {
+      this.door.doorHandle.spinLikeCrazy();
+      this.door.reset();
+    } else if (isValid && isEqual) {
+      this.door.isOpened = true;
+      this.vault.startAnimateBlinks();
+    }
+  }
+
   async load() {
     this.displayLoadingScreen();
     await this.utils.assetLoader.loadAssets();
   }
 
   async start() {
-    this.removeChildren();    
+    this.removeChildren();
     this.vault = new Vault();
     this.door = new Door();
-    
+
     this.addChild(this.vault);
     this.addChild(this.door);
+    this.door.initHitArea(true, () => {
+      this.onTap(true);
+    });
+    this.door.initHitArea(false, () => {
+      this.onTap(false);
+    });
   }
 
   onResize(width: number, height: number) {
