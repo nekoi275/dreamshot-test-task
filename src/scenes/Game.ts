@@ -1,5 +1,4 @@
-import { Container, Text, Graphics } from "pixi.js";
-import { centerObjects } from "../utils/misc";
+import { Container } from "pixi.js";
 import { SceneUtils } from "../core/App";
 import Vault from "../prefabs/Vault";
 import Door from "../prefabs/Door";
@@ -14,20 +13,6 @@ export default class Game extends Container {
   constructor(protected utils: SceneUtils) {
     super();
   }
-
-  private async displayLoadingScreen() {
-    const bg = new Graphics()
-      .beginFill(0x0b1354)
-      .drawRect(0, 0, window.innerWidth, window.innerHeight);
-    const text = new Text("Loading...", {
-      fontFamily: "Verdana",
-      fontSize: 50,
-      fill: "white",
-    });
-    text.resolution = 2;
-    centerObjects(text);
-    this.addChild(bg, text);
-  } 
 
   private onTap(isLeft: boolean) {
     this.door.doorHandle.controlAnimation(isLeft);
@@ -64,7 +49,6 @@ export default class Game extends Container {
   }
 
   async load() {
-    this.displayLoadingScreen();
     await this.utils.assetLoader.loadAssets();
   }
 
