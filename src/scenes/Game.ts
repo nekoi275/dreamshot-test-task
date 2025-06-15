@@ -27,7 +27,7 @@ export default class Game extends Container {
     text.resolution = 2;
     centerObjects(text);
     this.addChild(bg, text);
-  }
+  } 
 
   private onTap(isLeft: boolean) {
     this.door.doorHandle.controlAnimation(isLeft);
@@ -43,19 +43,24 @@ export default class Game extends Container {
       this.door.inputCombination
     );
 
-    if (!isValid && !isEqual) {
-      this.door.doorHandle.spinLikeCrazy();
-      this.door.reset();
+    if (!isValid) {
+      this.vault.stopTimer();
+      this.door.doorHandle.spinLikeCrazy(() => this.resetGame());
     } else if (isValid && isEqual) {
       this.door.isOpened = true;
       this.vault.startAnimateBlinks();
-      gsap.delayedCall(5, () => {
+      this.vault.stopTimer();
+      gsap.delayedCall(5, (callback: () => void) => {
         this.door.isOpened = false;
-        this.door.doorHandle.spinLikeCrazy();
-        this.door.reset();
-        this.vault.stopAnimateBlinks();
-      });
+        this.door.doorHandle.spinLikeCrazy(callback);
+      }, [() => this.resetGame()]);
     }
+  }
+
+  private resetGame() {
+    this.door.reset();
+    this.vault.stopAnimateBlinks();
+    this.vault.resetTimer();
   }
 
   async load() {

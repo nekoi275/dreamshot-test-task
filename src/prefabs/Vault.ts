@@ -1,4 +1,4 @@
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container, Sprite, Text, Texture, Ticker } from "pixi.js";
 import { gsap } from "gsap";
 
 export default class Vault extends Container {
@@ -7,6 +7,11 @@ export default class Vault extends Container {
   private blink1: Sprite = new Sprite(Texture.from("blink"));
   private blink2: Sprite = new Sprite(Texture.from("blink"));
   private blink3: Sprite = new Sprite(Texture.from("blink"));
+  private timerText: Text = new Text("00:00", {
+    fill: 0xffffff,
+    fontSize: 60,
+  });
+  private timerTicker: (() => void) | null = null;
 
   constructor() {
     super();
@@ -49,7 +54,7 @@ export default class Vault extends Container {
         ease: "power1.inOut",
       });
       gsap.to(sprite, {
-        rotation: Math.PI / 8,
+        rotation: Math.PI / 4,
         duration: 2,
         delay,
         yoyo: true,
@@ -67,14 +72,39 @@ export default class Vault extends Container {
     gsap.killTweensOf(this.blink1);
     gsap.killTweensOf(this.blink2);
     gsap.killTweensOf(this.blink3);
+    [this.blink1, this.blink2, this.blink3].every(item => item.alpha = 1)
   }
 
   init() {
+    this.resetTimer();
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.bg);
     this.addChild(this.blink1);
     this.addChild(this.blink2);
     this.addChild(this.blink3);
+    this.addChild(this.timerText);
+  }
+
+  resetTimer() {
+    this.timerText.text = "00:00";
+    
+    let gameStartTime = Date.now();
+    
+    this.timerTicker = () => {
+      const elapsedSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+      const minutes = Math.floor(elapsedSeconds / 60);
+      const seconds = elapsedSeconds % 60;
+      this.timerText!.text = `${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+    };
+    Ticker.shared.add(this.timerTicker);
+  }
+
+  stopTimer() {
+    if (this.timerTicker) {
+      Ticker.shared.remove(this.timerTicker);
+    }
   }
 
   setSize(width: number, height: number) {
@@ -88,5 +118,6 @@ export default class Vault extends Container {
     this.setupSprite(this.blink1, width, height, -100, -40);
     this.setupSprite(this.blink2, width, height, 200, 350);
     this.setupSprite(this.blink3, width, height, -480, -40);
+    this.setupSprite(this.timerText, width, height, -1178, -145);
   }
 }

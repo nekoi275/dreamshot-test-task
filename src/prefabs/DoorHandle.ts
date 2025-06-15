@@ -30,28 +30,30 @@ export default class DoorHandle extends Container {
     });
   }
 
-  spinLikeCrazy(): void {
+  spinLikeCrazy(onComplete: () => void): void {
     gsap.killTweensOf([this.handle, this.handleShadow]);
 
     const segments = 3 + Math.floor(Math.random() * 3); // 3-5 segments
-    const timeline = gsap.timeline();
+    let timeline = gsap.timeline();
 
     for (let i = 0; i < segments; i++) {
       const rotations = 2 + Math.floor(Math.random() * 5); // 2-6 rotations
       const direction = Math.random() > 0.5 ? 1 : -1;
       const duration = 0.5 + Math.random() * 1; // 0.5-1.5s per segment
 
-      timeline.to([this.handle, this.handleShadow], {
+      timeline = timeline.to([this.handle, this.handleShadow], {
         rotation: `+=${rotations * Math.PI * 2 * direction}`,
         duration,
         ease: "power1.inOut",
       });
     }
 
-    timeline.to([this.handle, this.handleShadow], {
-      rotation: this.handle.rotation % (Math.PI * 2), // Normalize final rotation
-      duration: 0.3,
-    });
+    timeline = timeline
+      .to([this.handle, this.handleShadow], {
+        rotation: this.handle.rotation % (Math.PI * 2), // normalize final rotation
+        duration: 0.3,
+      })
+      .eventCallback("onComplete", onComplete);
   }
 
   init() {
