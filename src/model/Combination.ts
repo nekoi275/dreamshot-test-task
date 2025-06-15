@@ -13,36 +13,25 @@ export default class Combination {
   private currentDirection: Direction | null = null;
 
   private addStep(turns: number, direction: Direction) {
+    if (turns < 1 || turns > 9) {
+      throw new Error("Turns must be between 1 and 9");
+    }
     this.sequence.push({ turns, direction });
   }
 
-  public equals(other: Combination): boolean {
-    if (this.sequence.length !== other.sequence.length) {
-      return false;
+  private handleTurn(newDirection: Direction): void {
+    if (this.currentDirection !== newDirection) {
+      this.addStep(1, newDirection);
+      this.currentDirection = newDirection;
+    } else {
+      const lastStep = this.sequence[this.sequence.length - 1];
+      if (lastStep) {
+        lastStep.turns += 1;
+      }
     }
-    return this.sequence.every(
-      (step, i) =>
-        step.turns === other.sequence[i].turns &&
-        step.direction === other.sequence[i].direction
-    );
   }
 
-  public isValid(other: Combination) {
-    if (other.sequence.length > this.sequence.length) {
-      return false;
-    }
-
-    return other.sequence.every((step, i) => {
-      const isLastStep = i === other.sequence.length - 1;
-      const turnsMatch = isLastStep
-        ? step.turns <= this.sequence[i].turns
-        : step.turns === this.sequence[i].turns;
-
-      return turnsMatch && step.direction === this.sequence[i].direction;
-    });
-  }
-
-  public static newRandom(length = 3): Combination {
+  static newRandom(length = 3): Combination {
     const combination = new Combination();
     let currentDirection =
       Math.random() > 0.5 ? Direction.Clockwise : Direction.CounterClockwise;
@@ -58,29 +47,43 @@ export default class Combination {
     return combination;
   }
 
-  public toString(): string {
+  equals(other: Combination): boolean {
+    if (this.sequence.length !== other.sequence.length) {
+      return false;
+    }
+    return this.sequence.every(
+      (step, i) =>
+        step.turns === other.sequence[i].turns &&
+        step.direction === other.sequence[i].direction
+    );
+  }
+
+  isValid(other: Combination) {
+    if (other.sequence.length > this.sequence.length) {
+      return false;
+    }
+
+    return other.sequence.every((step, i) => {
+      const isLastStep = i === other.sequence.length - 1;
+      const turnsMatch = isLastStep
+        ? step.turns <= this.sequence[i].turns
+        : step.turns === this.sequence[i].turns;
+
+      return turnsMatch && step.direction === this.sequence[i].direction;
+    });
+  }
+
+  toString(): string {
     return this.sequence
       .map((step) => `${step.turns} ${step.direction}`)
       .join(", ");
   }
 
-  public turnClockwise(): void {
+  turnClockwise(): void {
     this.handleTurn(Direction.Clockwise);
   }
 
-  public turnCounterClockwise(): void {
+  turnCounterClockwise(): void {
     this.handleTurn(Direction.CounterClockwise);
-  }
-
-  private handleTurn(newDirection: Direction): void {
-    if (this.currentDirection !== newDirection) {
-      this.addStep(1, newDirection);
-      this.currentDirection = newDirection;
-    } else {
-      const lastStep = this.sequence[this.sequence.length - 1];
-      if (lastStep) {
-        lastStep.turns += 1;
-      }
-    }
   }
 }

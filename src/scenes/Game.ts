@@ -15,7 +15,7 @@ export default class Game extends Container {
   }
 
   private onTap(isLeft: boolean) {
-    this.door.doorHandle.controlAnimation(isLeft);
+    this.door.doorHandle.rotationAnimation(isLeft);
 
     isLeft
       ? this.door.inputCombination.turnCounterClockwise()
@@ -31,14 +31,18 @@ export default class Game extends Container {
     if (!isValid) {
       this.vault.stopTimer();
       this.door.doorHandle.spinLikeCrazy(() => this.resetGame());
-    } else if (isValid && isEqual) {
+    } else if (isEqual) {
       this.door.isOpened = true;
       this.vault.startAnimateBlinks();
       this.vault.stopTimer();
-      gsap.delayedCall(5, (callback: () => void) => {
-        this.door.isOpened = false;
-        this.door.doorHandle.spinLikeCrazy(callback);
-      }, [() => this.resetGame()]);
+      gsap.delayedCall(
+        5,
+        (callback: () => void) => {
+          this.door.isOpened = false;
+          this.door.doorHandle.spinLikeCrazy(callback);
+        },
+        [() => this.resetGame()]
+      );
     }
   }
 
@@ -56,9 +60,7 @@ export default class Game extends Container {
     this.removeChildren();
     this.vault = new Vault();
     this.door = new Door();
-
-    this.addChild(this.vault);
-    this.addChild(this.door);
+    [this.vault, this.door].every((item) => this.addChild(item));
     this.door.initHitArea(true, () => {
       this.onTap(true);
     });
@@ -68,7 +70,6 @@ export default class Game extends Container {
   }
 
   onResize(width: number, height: number) {
-    this.vault.setSize(width, height);
-    this.door.setSize(width, height);
+    [this.vault, this.door].every((item) => item.setSize(width, height));
   }
 }
