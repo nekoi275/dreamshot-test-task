@@ -1,33 +1,22 @@
-## 🎮 Simple 2D Game Framework for [PixiJS](https://pixijs.com) using [Vite⚡](https://vitejs.dev/)
+## Simple 2D Game example with [PixiJS](https://pixijs.com) using [Vite⚡](https://vitejs.dev/)
 
-<a href="https://pixi-framework.onrender.com/" target="_blank">Demo</a>
+<a href="https://dreamshot-test-task.pages.dev/" target="_blank">Demo</a>
 
-### Highlights 🌟
+## Usage
 
-- Typescript
-- <a href="https://c.tenor.com/Hw0aKasI6B4AAAAC/fast-blazing-fast.gif" target="_blank">Blazing fast</a> builds and HMR through Vite
-- Scene management
-- Automagic asset loading per scene (sounds, spritesheets, textures, spine)
-- Keyboard input handling
-- Spine!
-
-## Usage 🛠️
-
-1. Clone repository `npx degit https://github.com/Hafaux/pixi-framework.git new-folder`
+1. Clone repository `git@github.com:nekoi275/dreamshot-test-task.git`
 
 2. Navigate to the new directory and install the project dependencies using `npm install`
 
-### Spine
+3. Use `npm run start` to start a local server with the project
 
-Place your exported spine animations in the `public/<scene>/spine` folder. The framework will automatically load them when you create the scene.
+4. Use `npm run build` to build for production
 
-```typescript
-...
-const anim = new SpineAnimation("spine-name");
+### Game instructions
 
-parent.addChild(anim);
+Open your browser console and find a secret combination to unlock the safe vault.
 
-await anim.play("anim-name");
+Tap / mouse click on the left (counterclockwise) or right (clockwise) side of the door handle following the order described in the combination.
 ...
 
 ```

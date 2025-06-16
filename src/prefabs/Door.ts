@@ -1,6 +1,7 @@
 import { Container, Sprite, Texture, Graphics } from "pixi.js";
 import DoorHandle from "../prefabs/DoorHandle";
 import Combination from "../model/Combination";
+import { setupSprite } from "../utils/misc";
 
 export default class Door extends Container {
   name = "Door";
@@ -15,28 +16,12 @@ export default class Door extends Container {
 
   constructor() {
     super();
+    console.log(this.secretCombination.toString());
     this.isOpened = false;
-
     this.init();
   }
 
-  private setupSprite(
-    sprite: Sprite,
-    width: number,
-    height: number,
-    offsetX: number,
-    offsetY: number
-  ) {
-    const scale = Math.min(width, height) / 3000; // target size / bg height in pixels
-    sprite.scale.set(scale);
-    sprite.anchor.set(0.5);
-    sprite.position.set(
-      width / 2 + offsetX * scale,
-      height / 2 + offsetY * scale
-    );
-  }
-
-  public set isOpened(isOpened: boolean) {
+  set isOpened(isOpened: boolean) {
     this._isOpened = isOpened;
     this.door.visible = !isOpened;
     this.doorOpen.visible = isOpened;
@@ -44,7 +29,7 @@ export default class Door extends Container {
     this.doorHandle.visible = !isOpened;
   }
 
-  public get isOpened() {
+  get isOpened() {
     return this._isOpened;
   }
 
@@ -55,7 +40,7 @@ export default class Door extends Container {
   }
 
   initHitArea(isLeft: boolean, eventHandler: (event: any) => void) {
-    const scale = Math.min(window.innerWidth, window.innerHeight) / 3000;
+    const scale = this.door.scale._x;
     const angle = isLeft ? Math.PI / 2 : -Math.PI / 2;
     const hitArea = new Graphics()
       .beginFill(0, 0.01)
@@ -71,17 +56,15 @@ export default class Door extends Container {
 
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
-    this.addChild(this.door);
-    this.addChild(this.doorHandle);
-    this.addChild(this.doorOpenShadow);
-    this.addChild(this.doorOpen);
-    console.log(this.secretCombination.toString());
+    [this.door, this.doorHandle, this.doorOpenShadow, this.doorOpen].every(
+      (item) => this.addChild(item)
+    );
   }
 
   setSize(width: number, height: number) {
-    this.setupSprite(this.door, width, height, 66, -40);
-    this.setupSprite(this.doorOpenShadow, width, height, 1520, 20);
-    this.setupSprite(this.doorOpen, width, height, 1450, -40);
+    setupSprite(this.door, width, height, 66, -40);
+    setupSprite(this.doorOpenShadow, width, height, 1520, 20);
+    setupSprite(this.doorOpen, width, height, 1450, -40);
 
     this.doorHandle.setSize(width, height);
   }

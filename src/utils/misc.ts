@@ -1,30 +1,17 @@
-import { DisplayObject, Sprite } from "pixi.js";
+import { Sprite } from "pixi.js";
 
-export function centerObjects(...toCenter: DisplayObject[]) {
-  const center = (obj: DisplayObject) => {
-    obj.x = window.innerWidth / 2;
-    obj.y = window.innerHeight / 2;
-
-    if (obj instanceof Sprite) {
-      obj.anchor.set(0.5);
-    }
-  };
-
-  toCenter.forEach(center);
-}
-
-export function wait(seconds: number) {
-  return new Promise<void>((res) => setTimeout(res, seconds * 1000));
-}
-
-export async function after(
-  seconds: number,
-  callback: (...args: unknown[]) => unknown
+export function setupSprite(
+  sprite: Sprite,
+  width: number,
+  height: number,
+  offsetX: number,
+  offsetY: number
 ) {
-  await wait(seconds);
-  return callback();
-}
-
-export function getEntries<T extends object>(obj: T) {
-  return Object.entries(obj) as Entries<T>;
+  const scale = Math.min(width, height) / 3000; // target size / bg height in pixels
+  sprite.scale.set(scale);
+  sprite.anchor.set(0.5);
+  sprite.position.set(
+    width / 2 + offsetX * scale,
+    height / 2 + offsetY * scale
+  );
 }

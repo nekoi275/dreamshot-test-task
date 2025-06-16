@@ -1,8 +1,8 @@
-import { Container, Text, Graphics } from "pixi.js";
-import { centerObjects } from "../utils/misc";
+import { Container } from "pixi.js";
 import { SceneUtils } from "../core/App";
 import Vault from "../prefabs/Vault";
 import Door from "../prefabs/Door";
+import { gsap } from "gsap";
 
 export default class Game extends Container {
   name = "Game";
@@ -14,22 +14,8 @@ export default class Game extends Container {
     super();
   }
 
-  private async displayLoadingScreen() {
-    const bg = new Graphics()
-      .beginFill(0x0b1354)
-      .drawRect(0, 0, window.innerWidth, window.innerHeight);
-    const text = new Text("Loading...", {
-      fontFamily: "Verdana",
-      fontSize: 50,
-      fill: "white",
-    });
-    text.resolution = 2;
-    centerObjects(text);
-    this.addChild(bg, text);
-  }
-
   private onTap(isLeft: boolean) {
-    this.door.doorHandle.controlAnimation(isLeft);
+    this.door.doorHandle.rotationAnimation(isLeft);
 
     isLeft
       ? this.door.inputCombination.turnCounterClockwise()
@@ -42,17 +28,31 @@ export default class Game extends Container {
       this.door.inputCombination
     );
 
-    if (!isValid && !isEqual) {
-      this.door.doorHandle.spinLikeCrazy();
-      this.door.reset();
-    } else if (isValid && isEqual) {
+    if (!isValid) {
+      this.vault.stopTimer();
+      this.door.doorHandle.spinLikeCrazy(() => this.resetGame());
+    } else if (isEqual) {
       this.door.isOpened = true;
       this.vault.startAnimateBlinks();
+      this.vault.stopTimer();
+      gsap.delayedCall(
+        5,
+        (callback: () => void) => {
+          this.door.isOpened = false;
+          this.door.doorHandle.spinLikeCrazy(callback);
+        },
+        [() => this.resetGame()]
+      );
     }
   }
 
+  private resetGame() {
+    this.door.reset();
+    this.vault.stopAnimateBlinks();
+    this.vault.resetTimer();
+  }
+
   async load() {
-    this.displayLoadingScreen();
     await this.utils.assetLoader.loadAssets();
   }
 
@@ -60,9 +60,7 @@ export default class Game extends Container {
     this.removeChildren();
     this.vault = new Vault();
     this.door = new Door();
-
-    this.addChild(this.vault);
-    this.addChild(this.door);
+    [this.vault, this.door].every((item) => this.addChild(item));
     this.door.initHitArea(true, () => {
       this.onTap(true);
     });
