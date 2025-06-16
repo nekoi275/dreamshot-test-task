@@ -70,6 +70,7 @@ export default class Game extends Container {
   }
 
   onResize(width: number, height: number) {
-    [this.vault, this.door].every((item) => item.setSize(width, height));
+    this.vault.setSize(width, height);
+    this.door.setSize(width, height);
   }
 }
