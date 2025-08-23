@@ -1,6 +1,5 @@
 import { Container, Sprite, Texture, Graphics } from "pixi.js";
 import DoorHandle from "../prefabs/DoorHandle";
-import Combination from "../model/Combination";
 import { setupSprite } from "../utils/misc";
 
 export default class Door extends Container {
@@ -11,12 +10,9 @@ export default class Door extends Container {
   private doorOpen: Sprite = new Sprite(Texture.from("doorOpen"));
   private _isOpened: boolean = false;
   doorHandle: DoorHandle = new DoorHandle();
-  secretCombination: Combination = Combination.newRandom(3);
-  inputCombination: Combination = new Combination();
 
   constructor() {
     super();
-    console.log(this.secretCombination.toString());
     this.isOpened = false;
     this.init();
   }
@@ -31,12 +27,6 @@ export default class Door extends Container {
 
   get isOpened() {
     return this._isOpened;
-  }
-
-  reset() {
-    this.secretCombination = Combination.newRandom(3);
-    this.inputCombination = new Combination();
-    console.log(this.secretCombination.toString());
   }
 
   initHitArea(isLeft: boolean, eventHandler: (event: any) => void) {

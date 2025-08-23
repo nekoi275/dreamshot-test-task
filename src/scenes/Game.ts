@@ -3,38 +3,45 @@ import { SceneUtils } from "../core/App";
 import Vault from "../prefabs/Vault";
 import Door from "../prefabs/Door";
 import { gsap } from "gsap";
+import Combination from "../model/Combination";
 
 export default class Game extends Container {
   name = "Game";
 
   private vault!: Vault;
   private door!: Door;
+  private secretCombination: Combination = Combination.newRandom(3);
+  private inputCombination: Combination = new Combination();
 
   constructor(protected utils: SceneUtils) {
     super();
+    console.log(this.secretCombination.toString());
   }
 
   private onTap(isLeft: boolean) {
+    if (!this.door.doorHandle.isControlable) return;
     this.door.doorHandle.rotationAnimation(isLeft);
 
     isLeft
-      ? this.door.inputCombination.turnCounterClockwise()
-      : this.door.inputCombination.turnClockwise();
+      ? this.inputCombination.turnCounterClockwise()
+      : this.inputCombination.turnClockwise();
 
-    const isValid = this.door.secretCombination.isValid(
-      this.door.inputCombination
+    const isValid = this.secretCombination.isValid(
+      this.inputCombination
     );
-    const isEqual = this.door.secretCombination.equals(
-      this.door.inputCombination
+    const isEqual = this.secretCombination.equals(
+      this.inputCombination
     );
 
     if (!isValid) {
       this.vault.stopTimer();
       this.door.doorHandle.spinLikeCrazy(() => this.resetGame());
     } else if (isEqual) {
-      this.door.isOpened = true;
-      this.vault.startAnimateBlinks();
-      this.vault.stopTimer();
+      gsap.delayedCall(0.3, () => {
+        this.door.isOpened = true;
+        this.vault.startAnimateBlinks();
+        this.vault.stopTimer();
+      });
       gsap.delayedCall(
         5,
         (callback: () => void) => {
@@ -47,7 +54,9 @@ export default class Game extends Container {
   }
 
   private resetGame() {
-    this.door.reset();
+    this.secretCombination = Combination.newRandom(3);
+    this.inputCombination = new Combination();
+    console.log(this.secretCombination.toString());
     this.vault.stopAnimateBlinks();
     this.vault.resetTimer();
   }
