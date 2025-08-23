@@ -7,11 +7,13 @@ export default class DoorHandle extends Container {
 
   private handleShadow: Sprite;
   private handle: Sprite;
+  isControlable: boolean;
 
   constructor() {
     super();
     this.handleShadow = new Sprite(Texture.from("handleShadow"));
     this.handle = new Sprite(Texture.from("handle"));
+    this.isControlable = true;
 
     this.init();
   }
@@ -29,7 +31,8 @@ export default class DoorHandle extends Container {
     });
   }
 
-  spinLikeCrazy(onComplete: () => void): void {
+  spinLikeCrazy(): Promise<void> {
+    this.isControlable = false;
     gsap.killTweensOf([this.handle, this.handleShadow]);
 
     const segments = 3 + Math.floor(Math.random() * 3); // 3-5 segments
@@ -47,12 +50,12 @@ export default class DoorHandle extends Container {
       });
     }
 
-    timeline = timeline
+    return timeline
       .to([this.handle, this.handleShadow], {
         rotation: this.handle.rotation % (Math.PI * 2), // normalize final rotation
         duration: 0.3,
       })
-      .eventCallback("onComplete", onComplete);
+      .then().then(() => { this.isControlable = true })
   }
 
   init() {

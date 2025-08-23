@@ -35,7 +35,7 @@ export default class Game extends Container {
 
     if (!isValid) {
       this.vault.stopTimer();
-      this.door.doorHandle.spinLikeCrazy(() => this.resetGame());
+      this.door.doorHandle.spinLikeCrazy().then(() => this.resetGame());
     } else if (isEqual) {
       gsap.delayedCall(0.3, () => {
         this.door.isOpened = true;
@@ -46,7 +46,7 @@ export default class Game extends Container {
         5,
         (callback: () => void) => {
           this.door.isOpened = false;
-          this.door.doorHandle.spinLikeCrazy(callback);
+          this.door.doorHandle.spinLikeCrazy().then(callback);
         },
         [() => this.resetGame()]
       );
