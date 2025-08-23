@@ -20,7 +20,6 @@ export default class Game extends Container {
 
   private onTap(isLeft: boolean) {
     if (!this.door.doorHandle.isControlable) return;
-    this.door.doorHandle.rotationAnimation(isLeft);
 
     isLeft
       ? this.inputCombination.turnCounterClockwise()
@@ -32,25 +31,32 @@ export default class Game extends Container {
     const isEqual = this.secretCombination.equals(
       this.inputCombination
     );
+    this.door.doorHandle.rotationAnimation(isLeft).then(_ => {
+      if (!isValid) {
+        this.gameOver();
+      } else if (isEqual) {
+        this.win();
+      }
+    });
+  }
 
-    if (!isValid) {
-      this.vault.stopTimer();
-      this.door.doorHandle.spinLikeCrazy().then(() => this.resetGame());
-    } else if (isEqual) {
-      gsap.delayedCall(0.3, () => {
-        this.door.isOpened = true;
-        this.vault.startAnimateBlinks();
-        this.vault.stopTimer();
-      });
-      gsap.delayedCall(
-        5,
-        (callback: () => void) => {
-          this.door.isOpened = false;
-          this.door.doorHandle.spinLikeCrazy().then(callback);
-        },
-        [() => this.resetGame()]
-      );
-    }
+  private gameOver() {
+    this.vault.stopTimer();
+    this.door.doorHandle.spinLikeCrazy().then(() => this.resetGame());
+  }
+
+  private win() {
+    this.door.isOpened = true;
+    this.vault.startAnimateBlinks();
+    this.vault.stopTimer();
+    gsap.delayedCall(
+      5,
+      (callback: () => void) => {
+        this.door.isOpened = false;
+        this.door.doorHandle.spinLikeCrazy().then(callback);
+      },
+      [() => this.resetGame()]
+    );
   }
 
   private resetGame() {

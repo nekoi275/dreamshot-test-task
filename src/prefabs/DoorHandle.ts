@@ -18,17 +18,17 @@ export default class DoorHandle extends Container {
     this.init();
   }
 
-  rotationAnimation(isLeft: boolean) {
+  rotationAnimation(isLeft: boolean): Promise<gsap.core.Tween> {
     const direction = isLeft ? -1 : 1;
     const currentRotation = this.handle.rotation;
     const targetRotation = currentRotation + (Math.PI / 3) * direction;
 
     gsap.killTweensOf([this.handle, this.handleShadow]);
-    gsap.to([this.handle, this.handleShadow], {
+    return gsap.to([this.handle, this.handleShadow], {
       rotation: targetRotation,
       duration: 0.3,
       ease: "power2.out",
-    });
+    }).then();
   }
 
   spinLikeCrazy(): Promise<void> {
