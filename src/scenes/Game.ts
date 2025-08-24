@@ -3,51 +3,66 @@ import { SceneUtils } from "../core/App";
 import Vault from "../prefabs/Vault";
 import Door from "../prefabs/Door";
 import { gsap } from "gsap";
+import Combination from "../model/Combination";
 
 export default class Game extends Container {
   name = "Game";
 
   private vault!: Vault;
   private door!: Door;
+  private secretCombination: Combination = Combination.newRandom(3);
+  private inputCombination: Combination = new Combination();
 
   constructor(protected utils: SceneUtils) {
     super();
+    console.log(this.secretCombination.toString());
   }
 
   private onTap(isLeft: boolean) {
-    this.door.doorHandle.rotationAnimation(isLeft);
+    if (!this.door.doorHandle.isControlable) return;
 
     isLeft
-      ? this.door.inputCombination.turnCounterClockwise()
-      : this.door.inputCombination.turnClockwise();
+      ? this.inputCombination.turnCounterClockwise()
+      : this.inputCombination.turnClockwise();
 
-    const isValid = this.door.secretCombination.isValid(
-      this.door.inputCombination
+    const isValid = this.secretCombination.isValid(
+      this.inputCombination
     );
-    const isEqual = this.door.secretCombination.equals(
-      this.door.inputCombination
+    const isEqual = this.secretCombination.equals(
+      this.inputCombination
     );
+    this.door.doorHandle.rotationAnimation(isLeft).then(_ => {
+      if (!isValid) {
+        this.gameOver();
+      } else if (isEqual) {
+        this.win();
+      }
+    });
+  }
 
-    if (!isValid) {
-      this.vault.stopTimer();
-      this.door.doorHandle.spinLikeCrazy(() => this.resetGame());
-    } else if (isEqual) {
-      this.door.isOpened = true;
-      this.vault.startAnimateBlinks();
-      this.vault.stopTimer();
-      gsap.delayedCall(
-        5,
-        (callback: () => void) => {
-          this.door.isOpened = false;
-          this.door.doorHandle.spinLikeCrazy(callback);
-        },
-        [() => this.resetGame()]
-      );
-    }
+  private gameOver() {
+    this.vault.stopTimer();
+    this.door.doorHandle.spinLikeCrazy().then(() => this.resetGame());
+  }
+
+  private win() {
+    this.door.isOpened = true;
+    this.vault.startAnimateBlinks();
+    this.vault.stopTimer();
+    gsap.delayedCall(
+      5,
+      (callback: () => void) => {
+        this.door.isOpened = false;
+        this.door.doorHandle.spinLikeCrazy().then(callback);
+      },
+      [() => this.resetGame()]
+    );
   }
 
   private resetGame() {
-    this.door.reset();
+    this.secretCombination = Combination.newRandom(3);
+    this.inputCombination = new Combination();
+    console.log(this.secretCombination.toString());
     this.vault.stopAnimateBlinks();
     this.vault.resetTimer();
   }
@@ -60,7 +75,7 @@ export default class Game extends Container {
     this.removeChildren();
     this.vault = new Vault();
     this.door = new Door();
-    [this.vault, this.door].every((item) => this.addChild(item));
+    this.addChild(this.vault, this.door);
     this.door.initHitArea(true, () => {
       this.onTap(true);
     });
