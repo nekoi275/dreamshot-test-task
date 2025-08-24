@@ -1,6 +1,10 @@
 import { Container, Sprite, Texture, Graphics } from "pixi.js";
 import DoorHandle from "../prefabs/DoorHandle";
 import { setupSprite } from "../utils/misc";
+import { gsap } from "gsap";
+import { CSSPlugin } from "gsap/CSSPlugin";
+
+gsap.registerPlugin(CSSPlugin);
 
 export default class Door extends Container {
   name = "Door";
@@ -9,6 +13,7 @@ export default class Door extends Container {
   private doorOpenShadow: Sprite = new Sprite(Texture.from("doorOpenShadow"));
   private doorOpen: Sprite = new Sprite(Texture.from("doorOpen"));
   private _isOpened: boolean = false;
+
   doorHandle: DoorHandle = new DoorHandle();
 
   constructor() {
@@ -19,14 +24,33 @@ export default class Door extends Container {
 
   set isOpened(isOpened: boolean) {
     this._isOpened = isOpened;
-    this.door.visible = !isOpened;
-    this.doorOpen.visible = isOpened;
-    this.doorOpenShadow.visible = isOpened;
-    this.doorHandle.visible = !isOpened;
+    if (isOpened) {
+      this.openDoor();
+    } else {
+      this.door.visible = true;
+      this.doorHandle.visible = true;
+      this.doorOpen.visible = false;
+      this.doorOpenShadow.visible = false;
+    }
   }
 
   get isOpened() {
     return this._isOpened;
+  }
+
+  openDoor() {
+    gsap.killTweensOf([this.door, this.doorHandle]);
+    gsap.to([this.door, this.doorHandle], {
+      scaleX: 0.5,
+      duration: 1,
+      transformOrigin: "right center",
+      ease: "power2.out",
+      onComplete: () => {
+        this.door.visible = false;
+        this.doorHandle.visible = false;
+        this.doorOpen.visible = true;
+      },
+    });
   }
 
   initHitArea(isLeft: boolean, eventHandler: (event: any) => void) {
@@ -46,8 +70,11 @@ export default class Door extends Container {
 
   init() {
     this.setSize(window.innerWidth, window.innerHeight);
-    [this.door, this.doorHandle, this.doorOpenShadow, this.doorOpen].every(
-      (item) => this.addChild(item)
+    this.addChild(
+      this.door,
+      this.doorHandle,
+      this.doorOpenShadow,
+      this.doorOpen
     );
   }
 

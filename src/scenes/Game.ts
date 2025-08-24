@@ -75,7 +75,7 @@ export default class Game extends Container {
     this.removeChildren();
     this.vault = new Vault();
     this.door = new Door();
-    [this.vault, this.door].every((item) => this.addChild(item));
+    this.addChild(this.vault, this.door);
     this.door.initHitArea(true, () => {
       this.onTap(true);
     });

@@ -57,15 +57,15 @@ export default class Vault extends Container {
   }
 
   stopAnimateBlinks() {
-    this.blinks.every((item) => gsap.killTweensOf(item));
-    this.blinks.every((item) => (item.alpha = 1));
+    this.blinks.forEach((item) => gsap.killTweensOf(item));
+    this.blinks.forEach((item) => (item.alpha = 1));
   }
 
   init() {
     this.resetTimer();
     this.setSize(window.innerWidth, window.innerHeight);
     this.addChild(this.bg);
-    this.blinks.every((item) => this.addChild(item));
+    this.addChild(...this.blinks);
     this.addChild(this.timerText);
   }
 
